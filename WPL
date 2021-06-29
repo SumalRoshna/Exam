@@ -1,0 +1,219 @@
+<?php
+$w=new mysqli("localhost","root","") or die("connection failed");
+$q="create database Hospital";
+if($w->query($q)===TRUE)
+{
+    echo "Database creation successful";
+}
+else
+{
+    echo "connection failed".$w->error;
+}
+?>
+____________________________________________________________________________________________________________________________________________________________________________
+
+<?php
+$w=new mysqli("localhost","root","","Hospital");
+$q="create table Patient(patient_name varchar(25) not null, address varchar(25) not null, doctor_name varchar(25) not null, admission_date date, room_number bigint not null)";
+if($w->query($q)===TRUE)
+{
+    echo "Table created successfully";
+}
+ else   
+ {
+     echo "conection failed".$w->error;
+ }
+ ?>
+ ____________________________________________________________________________________________________________________________________________________________________________
+ 
+ <?php
+$w=new mysqli("localhost","root","","Hospital") or die("Connection Failed");
+?>
+<html>
+    <head>
+        <title>Hospital In-patient management system</title>
+        <style>
+        body{
+            background-color: grey;
+        }
+        table,th,td{
+            border: 2px solid black;
+            width: 1100px;
+            background-color: white;
+        }
+    </style>
+    </head>
+    <body>
+        <h3 align="center">Hospital In-Patient Management System</h3>
+        <form onSubmit="return validation()" method="POST" ACTION="#">
+         <table align="center" border="1" width="50%">
+                <tr>
+                    <th>Patient Name</th>
+                    <td><input type="text" name="patient_name" id="patient_name" placeholder="Enter Patient name.." required=""></td>
+                </tr>
+                <tr>
+                    <th>Address</th>
+                    <td><input type="text" name="address" id="address" placeholder="Enter address.." required=""></td>
+                </tr>
+                <tr>
+                    <th>Doctor Name</th>
+                    <td><input type="text" name="doctor_name" id="doctor_name" placeholder="Enter Doctor's name.." required=""></td>
+                </tr>
+                <tr>
+                    <th>Admission Date</th>
+                    <td><input type="date" name="admission_date" id="admission_date" required=""></td>
+                </tr>
+                <tr>
+                    <th>Room Number</th>
+                    <td><input type="text" name="room_number" id="room_number" placeholder="Enter room number.." required=""></td>
+                </tr>
+                <tr>
+                    <th colspan="2" align=center""><input type="submit" name="submit" value="Submit"></th>
+                </tr>
+            </table>
+            
+        </form>
+<?php
+if (isset($_POST['submit']))
+{
+    $pn=$_POST['patient_name'];
+    $add=$_POST['address'];
+    $dn=$_POST['doctor_name'];
+    $dt=$_POST['admission_date'];
+    $rn=$_POST['room_number'];
+    $qr="insert into Patient values('$pn','$add','$dn','$dt','$rn')";
+    if ($w->query($qr)===TRUE)
+    {
+        $s="select * from Patient";
+        $re=$w->query($s);
+        if($re->num_rows>0)
+        {
+        ?>
+<table align="center" border="1">
+    <tr>
+        <th>Patient Name</th>
+        <th>Doctor Name</th>
+        <th>Room Number</th>
+    </tr>
+    <tr>
+       <?php 
+        while($u=$re->fetch_assoc())
+        {
+           
+            ?>
+        <td><?php echo $u['patient_name']; ?></td>
+        <td><?php echo $u['doctor_name']; ?></td>
+        <td><?php echo $u['room_number']; ?></td>
+    </tr>
+    
+        <?php
+        }?>
+        
+</table>
+<?php
+    }
+
+ else {
+ 
+        echo 'Error Inserting Details';    
+    }
+}
+ else {
+    echo 'Error Occured'.$w->error;
+}
+}
+$w->close();
+?>
+        <script type="text/javascript">
+            function validation()
+            {
+                var patient_name=document.getElementById("patient_name");
+                var doctor_name=document.getElementById("doctor_name");
+                var address=document.getElementById("address");
+                var room_number=document.getElementById("room_number");
+                var id=/^[0-9]+$/;
+                
+                if(!patient_name.value.match(/^[a-z A-Z]+$/))
+                {
+                    window.alert("Please enter a valid Patient name");
+                    return false;
+                }
+                if(!doctor_name.value.match(/^[a-z A-Z]+$/))
+                {
+                    window.alert("Please enter a valid Doctor name");
+                    return false;
+                }
+                if(room_number.value=="")
+                {
+                    window.alert("Please enter a room number");
+                    return false;
+                }
+                if(!(room_number.value.match(id)))
+                {
+                    window.alert("Please enter a valid room number");
+                    return false;
+                }
+                
+                return true;
+
+            }
+         </script>
+    </body>
+</html>
+____________________________________________________________________________________________________________________________________________________________________________
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Search patient by room number</title>
+	<style>
+		body{
+			background-color: grey;
+		}
+		table,th,td{
+			border: 2px solid black;
+			width: 1100px;
+			background-color: white;
+		}
+	</style>
+</head>
+<body>
+	<center>
+		<div class="container">
+			<form action="" method="POST">
+				<input type="text" name="room_number" placeholder="Enter room number" >
+				<input type="submit" name="search" value="SEARCH">
+			</form>
+			<table>
+				<tr>
+				<th>Patient Name</th>
+				<th>Doctor Name</th>
+				<th>Room Number</th>
+				</tr><br>
+			<?php
+			$connection=mysqli_connect("localhost","root","");
+			$db=mysqli_select_db($connection,"Hospital");
+			if(isset($_POST['search']))
+			{
+				$rn=$_POST['room_number'];
+				$query="SELECT * FROM Patient where room_number='$rn' ";
+				$query_run=mysqli_query($connection,$query) or die( mysqli_error($connection));
+
+				while($row=mysqli_fetch_array($query_run))
+				{
+					?>
+					<tr>
+						<td><?php echo $row['patient_name'];?></td>
+						<td><?php echo $row['doctor_name'];?></td>
+						<td><?php echo $row['room_number'];?></td>
+					</tr>
+					<?php
+				}
+			}
+			?>
+			</table>
+		</div>
+	</center>
+</body>
+</html>
+______________________________________________________________________________________________________________________________________________________________________
